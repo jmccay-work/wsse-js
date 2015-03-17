@@ -10,6 +10,8 @@
  * @returns {string} Base64-encoded string.
  */
 function Base64Encode(str) {
+    if (/([^\u0000-\u00ff])/.test(str)) throw Error('String must be ASCII');
+
     var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
     var o1, o2, o3, bits, h1, h2, h3, h4, e=[], pad = '', c;
 
@@ -50,6 +52,8 @@ function Base64Encode(str) {
  * @returns {string} Decoded ASCII/ISO-8859-1 string.
  */
 function Base64Decode(str) {
+    if (!(/^[a-z0-9+/]+={0,2}$/i.test(str)) || str.length%4 != 0) throw Error('Not base64 string');
+
     var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
     var o1, o2, o3, h1, h2, h3, h4, bits, d=[];
 
