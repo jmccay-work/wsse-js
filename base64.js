@@ -29,7 +29,7 @@
      let b64 = B64_CHARS;
      let o1, o2, o3, bits, h1, h2, h3, h4, e=[], pad = '', c;
  
-     c = str.length % 3;  // pad string to length of multiple of 3
+     c = str_.length % 3;  // pad string to length of multiple of 3
      if (c > 0) { while (c++ < 3) { pad += '='; str_ += '\0'; } }
      // note: doing padding here saves us doing special-case packing for trailing 1 or 2 chars
  
