@@ -14,7 +14,7 @@
 //
 // Changelog:
 //   2005.07.21 - Release 1.0
-//
+//   2022.03.11 - JLM Updated for ES6 and use strict
 
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined
@@ -211,7 +211,8 @@ function binb2hex(binarray_) {
         str +=
             hex_tab.charAt(
                 (binarray_[i >> 2] >> ((3 - (i % 4)) * 8 + 4)) & 0xf
-            ) + hex_tab.charAt((binarray_[i >> 2] >> ((3 - (i % 4)) * 8)) & 0xf);
+            ) +
+            hex_tab.charAt((binarray_[i >> 2] >> ((3 - (i % 4)) * 8)) & 0xf);
     }
     return str;
 }
@@ -242,7 +243,7 @@ function binb2b64(binarray_) {
 // http://www.aardwulf.com/tutor/base64/
 function encode64(input_) {
     let keyStr = `${VALID_CHARS}=`;
-/* 
+    /* 
     let keyStr = "ABCDEFGHIJKLMNOP" +
                 "QRSTUVWXYZabcdef" +
                 "ghijklmnopqrstuv" +
@@ -276,12 +277,7 @@ function encode64(input_) {
             enc4 = 64;
         }
 
-        output =
-            output +
-            keyStr.charAt(enc1) +
-            keyStr.charAt(enc2) +
-            keyStr.charAt(enc3) +
-            keyStr.charAt(enc4);
+        output = output + keyStr.charAt(enc1) + keyStr.charAt(enc2) + keyStr.charAt(enc3) + keyStr.charAt(enc4);
         chr1 = chr2 = chr3 = "";
         enc1 = enc2 = enc3 = enc4 = "";
     } while (i < input_.length);
@@ -308,6 +304,9 @@ function encode64(input_) {
 // CREATED
 // 2000-09-15T09:42:53+01:00
 //
+// UPDATED
+// 2022-03-11 JLM Updated to ES6 and to use less strings.
+//
 // REFERENCES
 // For more about ISO 8601 see:
 // http://www.w3.org/TR/NOTE-datetime
@@ -320,10 +319,12 @@ function encode64(input_) {
 //
 function isodatetime() {
     let today = new Date();
-    let year = today.getYear();
-    if (year < 2000)
+    let year = today.getFullYear();
+    if (year < 2000) {
+        // this should not be needed now
         // Y2K Fix, Isaac Powell
         year = year + 1900; // http://onyx.idbsu.edu/~ipowell
+    }
     let month = today.getMonth() + 1;
     let day = today.getDate();
     let hour = today.getHours();
@@ -343,39 +344,14 @@ function isodatetime() {
     if (minute != minuteUTC && minuteUTC > 30 && diff > 0) {
         hourdifference--;
     }
-    if (minute != minuteUTC) {
-        minutedifference = ":30";
-    } else {
-        minutedifference = ":00";
-    }
-    if (hourdifference < 10) {
-        timezone = "0" + hourdifference + minutedifference;
-    } else {
-        timezone = "" + hourdifference + minutedifference;
-    }
-    if (diff < 0) {
-        timezone = "-" + timezone;
-    } else {
-        timezone = "+" + timezone;
-    }
-    if (month <= 9) month = "0" + month;
-    if (day <= 9) day = "0" + day;
-    if (hour <= 9) hour = "0" + hour;
-    if (minute <= 9) minute = "0" + minute;
-    if (second <= 9) second = "0" + second;
-    time =
-        year +
-        "-" +
-        month +
-        "-" +
-        day +
-        "T" +
-        hour +
-        ":" +
-        minute +
-        ":" +
-        second +
-        timezone;
+    minutedifference = (minute != minuteUTC)? ":30" : ":00";
+    timezone = `${diff < 0 ? "-" : "+"}${(hourdifference < 10)?"0":""}${hourdifference}${minutedifference}`;
+    if (month <= 9) month = `0${month}`; //"0" + month;
+    if (day <= 9) day = `0${day}`; //"0" + day;
+    if (hour <= 9) hour = `0${hour}`; //"0" + hour;
+    if (minute <= 9) minute = `0${minute}`; //"0" + minute;
+    if (second <= 9) second = `0${second}`; //"0" + second;
+    let time = `${year}-${month}-${day}T${hour}:${minute}:${second}${timezone}`;
     return time;
 }
 
@@ -399,8 +375,9 @@ function wsse(password_) {
     let r = new Array();
 
     //    Nonce = b64_sha1(isodatetime() + 'There is more than words');
-    nonce = b64_sha1(`${isodatetime()}There is more than words`);
-    nonceEncoded = encode64(nonce);
+    let t = `${isodatetime()}There is more than words${( Date.now() )}`;
+    nonce = b64_sha1(t);
+    let nonceEncoded = encode64(nonce);
     created = isodatetime();
     passwordDigest = b64_sha1(nonce + created + password_);
 
